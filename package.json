@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "jsdom": "^19.0.0"
+    "fs": "^0.0.1-security",
+    "jsdom": "^19.0.0",
+    "json-as-xlsx": "^2.4.0",
+    "request": "^2.88.2",
+    "xlsx": "^0.18.5"
   }
 }

@@ -2,6 +2,8 @@ const request = require("request");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const fs = require("fs");
+const xlsx = require("json-as-xlsx");
+
 
 const link = "https://www.espncricinfo.com/series/ipl-2021-1249214/match-results";
 
@@ -16,9 +18,10 @@ function cb(error,response,html){
     }else{
         const dom = new JSDOM(html);
         const document = dom.window.document;
-        let allScorecardTags = document.querySelectorAll('a[data-hover="Scorecard"]');
-        for(let i=0;i<allScorecardTags.length;i++){
-            let link = allScorecardTags[i].href;
+        let allScorecardTags = document.querySelectorAll('.ds-border-b.ds-border-line');
+        for(let i=0;i<60;i++){
+            let anchortagall = allScorecardTags[i].querySelectorAll('a')
+            let link = anchortagall[2].href;
             let completeLink = "https://www.espncricinfo.com"+link;
             // console.log(completeLink);
             request(completeLink,cb2);
@@ -34,7 +37,7 @@ function cb2(error,response,html){
     }else{
         const dom = new JSDOM(html);
         const document = dom.window.document;
-        let batsmenRow = document.querySelectorAll(".table.batsman tbody tr");
+        let batsmenRow = document.querySelectorAll('tbody [class="ds-border-b ds-border-line ds-text-tight-s"]');
         for(let i=0;i<batsmenRow.length;i++){
             let cells = batsmenRow[i].querySelectorAll("td");
             if(cells.length == 8){
@@ -53,6 +56,28 @@ function cb2(error,response,html){
             let data = JSON.stringify(leaderboard);
             fs.writeFileSync('BatsmenStats.json',data);
 
+            let dataExcel = [
+                {
+                    sheet: "Ipl Stats",
+                    columns: [
+                        { label: "Name", value: "Name" }, // Top level data
+                        { label: "Innings", value: "Innings" },
+                        { label: "Runs", value: "Runs" }, // Custom format
+                        { label: "Balls", value: "Balls" }, // Run functions
+                        { label: "Fours", value: "Fours" },
+                        { label: "Sixes", value: "Sixes" },
+                    ],
+                    content: leaderboard
+                    //[{Name:"Rahul",Innings:16,Runs:422,Balls......}]
+                },
+            ]
+
+            let settings = {
+                fileName: "BatsmenDetail", // Name of the resulting spreadsheet
+                extraLength: 3, // A bigger number means that columns will be wider
+                writeOptions: {}, // Style options from https://github.com/SheetJS/sheetjs#writing-options
+            }
+            xlsx(dataExcel, settings) // Will download the excel file
 
         }
     }
