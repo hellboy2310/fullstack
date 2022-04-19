@@ -1,7 +1,8 @@
 const puppeteer = require("puppeteer");
 const mail = "cawosad436@aikusy.com";
 const pass = "ush@_1234";
-let browserpromise = puppeteer.launch({ headless:false});// this will promise us to open the browser
+let browserpromise = puppeteer.launch({ headless: false, defaultViewport: null,args: ['--start-fullscreen'] }
+);// this will promise us to open the browser
 
 let page;
 
@@ -17,13 +18,7 @@ browserpromise.then(function(browser)
     return urlpromise;
 }).then(function()
 {
-    console.log("hackerrank page is opened");
-    let waitpromise = page.waitForSelector("ul.menu a");
-    return waitpromise;
-}).then(function()
-{
-    let clickpromise = page.click("ul.menu a");
-    return clickpromise;
+return waitandclick('ul.menu a');
 }).then(function(){
     let waitpromise = page.waitForSelector(".fl-module-content.fl-node-content .fl-button");
     return waitpromise;
@@ -48,12 +43,7 @@ browserpromise.then(function(browser)
     return clickpromise;
 }).then(function()
 {
-    console.log("login is successfull");
-    let waitpromise = page.waitForSelector('[data-automation="algorithms"]');
-    return waitpromise;
-}).then(function(){
-    let clickpromise = page.click('[data-automation="algorithms"]');
-    return clickpromise;
+   return waitandclick('[data-automation="algorithms"]');
 }).then(function(){
     return page.waitForSelector(".filter-group");
 }).then(function(){
@@ -70,4 +60,22 @@ browserpromise.then(function(browser)
     return page.waitForSelector('.ui-btn.ui-btn-normal.primary-cta.ui-btn-line-primary.ui-btn-styled');
 
 })
+.then(function(){
+
+})
+
+function waitandclick(selector)
+{
+    return new Promise(function(resolve,reject){
+        let waitpromise = page.waitForSelector(selector);
+        waitpromise.then(function(){
+            let clickpromise = page.click(selector);
+            return clickpromise;
+        }).then(function(){
+            resolve();
+        });
+    })
+}
+
+
 
