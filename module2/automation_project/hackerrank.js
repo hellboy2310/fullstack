@@ -77,6 +77,17 @@ return waitandclick('ul.menu a');
 }).then(function(questionsArr){
     console.log(questionsArr);
     let questionpromise = questionSolver(questionsArr[0],code.answers[0]);
+    for(let i=1;i<questionsArr.length;i++)
+    {
+        questionpromise = questionpromise.then(function(){
+            let nextQuestionpromise = questionSolver(questionsArr[i],code.answers[i]);
+            return nextQuestionpromise;
+        })
+    }
+    return questionpromise;
+
+}).then(function(){
+    console.log("all the warm up questions has been submitted");
 })
 
 function waitandclick(selector)
@@ -132,9 +143,14 @@ function questionSolver(question,answer)
             let pressv = page.keyboard.press('V');
             return pressv;
         }).then(function(){
+            let upcontrol = page.keyboard.up("Control");
+            return upcontrol;
+        })
+        .then(function(){
             return waitandclick(".ui-btn.ui-btn-normal.ui-btn-primary.pull-right.hr-monaco-submit.ui-btn-styled");
         }).then(function(){
             console.log("questions submitted successfully");
+        resolve();
         })
 
     })
